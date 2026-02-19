@@ -63,19 +63,9 @@ class Greptile < Formula
     system "launchctl", "load", plist_dest
   end
 
-  # Also available via: brew services start/stop/restart greptile
-  service do
-    run [Formula["node"].opt_bin/"node", opt_libexec/"health-server.js"]
-    working_dir opt_libexec
-    keep_alive true
-    log_path var/"log/greptile-health.log"
-    error_log_path var/"log/greptile-health.log"
-  end
-
   def caveats
     <<~EOS
       The health server has been started automatically on port 4747.
-      To manage it manually: brew services start/stop/restart greptile
 
       Repo path mappings are stored in ~/.greptile/repos.json.
       The first time you click "Fix in Claude Code" for a repo,
