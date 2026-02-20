@@ -22,54 +22,27 @@ class Greptile < Formula
     system "bash", "build-app.sh", prefix
   end
 
+  service do
+    run [Formula["node"].opt_bin/"node", opt_libexec/"health-server.js"]
+    working_dir opt_libexec
+    keep_alive true
+    log_path var/"log/greptile-health.log"
+    error_log_path var/"log/greptile-health.log"
+  end
+
   def post_install
-    # Set up and start the health server LaunchAgent automatically
-    plist_dir = Pathname.new("#{Dir.home}/Library/LaunchAgents")
-    plist_dir.mkpath
-
-    node_bin = Formula["node"].opt_bin/"node"
-    plist_dest = plist_dir/"com.greptile.health.plist"
-
-    # Generate plist with correct paths
-    plist_content = <<~XML
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>com.greptile.health</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{node_bin}</string>
-          <string>health-server.js</string>
-        </array>
-        <key>WorkingDirectory</key>
-        <string>#{opt_libexec}</string>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>KeepAlive</key>
-        <true/>
-        <key>StandardOutPath</key>
-        <string>/tmp/greptile-health.log</string>
-        <key>StandardErrorPath</key>
-        <string>/tmp/greptile-health.log</string>
-      </dict>
-      </plist>
-    XML
-
-    # Unload if already running, write new plist, load it
-    system "launchctl", "unload", plist_dest.to_s if plist_dest.exist?
-    # Write via shell to avoid Homebrew sandbox restrictions on ~/Library
-    tmpfile = "#{Dir.tmpdir}/com.greptile.health.plist"
-    File.write(tmpfile, plist_content)
-    system "cp", tmpfile, plist_dest.to_s
-    File.delete(tmpfile) if File.exist?(tmpfile)
-    system "launchctl", "load", plist_dest.to_s
+    # Automatically start the health server service
+    system "brew", "services", "start", name
   end
 
   def caveats
     <<~EOS
-      The health server has been started automatically on port 4747.
+      The health server runs on port 4747 via `brew services`.
+
+      To manage it:
+        brew services start greptile   # start
+        brew services stop greptile    # stop
+        brew services restart greptile # restart
 
       Repo path mappings are stored in ~/.greptile/repos.json.
       The first time you click "Fix in Claude Code" for a repo,
