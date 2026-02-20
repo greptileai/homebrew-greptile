@@ -58,9 +58,13 @@ class Greptile < Formula
     XML
 
     # Unload if already running, write new plist, load it
-    system "launchctl", "unload", plist_dest if plist_dest.exist?
-    plist_dest.write(plist_content)
-    system "launchctl", "load", plist_dest
+    system "launchctl", "unload", plist_dest.to_s if plist_dest.exist?
+    # Write via shell to avoid Homebrew sandbox restrictions on ~/Library
+    tmpfile = "#{Dir.tmpdir}/com.greptile.health.plist"
+    File.write(tmpfile, plist_content)
+    system "cp", tmpfile, plist_dest.to_s
+    File.delete(tmpfile) if File.exist?(tmpfile)
+    system "launchctl", "load", plist_dest.to_s
   end
 
   def caveats
