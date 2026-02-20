@@ -30,19 +30,10 @@ class Greptile < Formula
     error_log_path var/"log/greptile-health.log"
   end
 
-  def post_install
-    # Automatically start the health server service
-    system "brew", "services", "start", name
-  end
-
   def caveats
     <<~EOS
-      The health server runs on port 4747 via `brew services`.
-
-      To manage it:
-        brew services start greptile   # start
-        brew services stop greptile    # stop
-        brew services restart greptile # restart
+      To start the health server (required for "Fix in IDE" buttons):
+        brew services start greptile
 
       Repo path mappings are stored in ~/.greptile/repos.json.
       The first time you click "Fix in Claude Code" for a repo,
