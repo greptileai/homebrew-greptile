@@ -2,7 +2,7 @@ class Greptile < Formula
   desc "Bridge for Greptile code review 'Fix in Claude Code' and 'Fix in Codex' links"
   homepage "https://greptile.com"
   url "https://github.com/greptileai/homebrew-greptile/releases/download/v2.2.5/greptile-cli-v2.2.5.tar.gz"
-  sha256 "4675411b1f96dca36384d0fa67684a2edb354cbb26755cdd7d2d1c633a3f1bab"
+  sha256 "810336617477b26bfac39a62c39cff1d591e32a8cd2bf5e23f0b2d9eb87ab79a"
   license "MIT"
 
   depends_on :macos
